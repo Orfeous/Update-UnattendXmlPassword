@@ -3,8 +3,8 @@
   param
   (
     [Parameter(Mandatory)]
-    $Path
-    ,
+    $Path,
+
     [Parameter(Mandatory)]
     [string]
     $Password
@@ -12,7 +12,8 @@
   $ErrorActionPreference = 'Stop'
   try
   {
-    [xml]$UnattendXml = Get-Content -Path $Path
+    $ResolvedPath = (Resolve-Path -Path $Path).Path
+    [xml]$UnattendXml = Get-Content -Path $ResolvedPath
     $AdminPW = $UnattendXml.unattend.settings.component.useraccounts.administratorpassword
     if ($AdminPW.PlainText -eq 'false')
     {
@@ -23,7 +24,7 @@
     {
       $AdminPW.Value = $Password
     }
-    $UnattendXml.Save($Path)
+    $UnattendXml.Save($ResolvedPath)
   }
   catch
   {
