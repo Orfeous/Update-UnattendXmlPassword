@@ -1,7 +1,5 @@
-﻿function Update-UnattendXmlPassword
-{
-  param
-  (
+function Update-UnattendXmlPassword {
+  param (
     [Parameter(Mandatory)]
     $Path,
 
@@ -10,24 +8,20 @@
     $Password
   )
   $ErrorActionPreference = 'Stop'
-  try
-  {
+  try {
     $ResolvedPath = (Resolve-Path -Path $Path).Path
     [xml]$UnattendXml = Get-Content -Path $ResolvedPath
     $AdminPW = $UnattendXml.unattend.settings.component.useraccounts.administratorpassword
-    if ($AdminPW.PlainText -eq 'false')
-    {
+    if ($AdminPW.PlainText -eq 'false') {
       $PlainText = '{0}AdministratorPassword' -f $Password
       $AdminPW.Value = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($PlainText))
     }
-    else
-    {
+    else {
       $AdminPW.Value = $Password
     }
     $UnattendXml.Save($ResolvedPath)
   }
-  catch
-  {
+  catch {
     $_.Exception.Message
   }
 }
